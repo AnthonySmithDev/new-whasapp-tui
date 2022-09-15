@@ -23,7 +23,7 @@ func (cli Client) Connect() {
 	if cli.WAClient.Store.ID == nil {
 		cli.GetQR()
 	}
-	cli.AddEventHandler()
+	cli.eventHandlerID = cli.WAClient.AddEventHandler(cli.eventHandler)
 	if err := cli.WAClient.Connect(); err != nil {
 		logMain.Errorf("Failed to connect: %v", err)
 		return

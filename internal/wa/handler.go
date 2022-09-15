@@ -14,10 +14,6 @@ import (
 	"go.mau.fi/whatsmeow/types/events"
 )
 
-func (cli Client) AddEventHandler() {
-	cli.eventHandlerID = cli.WAClient.AddEventHandler(cli.eventHandler)
-}
-
 var historySyncID int32
 var startupTime = time.Now().Unix()
 
