@@ -17,6 +17,9 @@ type Bubble struct {
 	viewport  viewport.Model
 	appConfig config.Config
 	ready     bool
+
+	sub       chan struct{} // where we'll receive activity notifications
+	responses int           // how many responses we've received
 }
 
 // NewBubble creates an instance of the UI.
@@ -37,5 +40,7 @@ func NewBubble(cfg config.Config) Bubble {
 		viewport:  viewport.Model{},
 		appConfig: cfg,
 		ready:     false,
+
+		sub: make(chan struct{}),
 	}
 }

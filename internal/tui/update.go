@@ -11,11 +11,14 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
+	case responseMsg:
+		b.responses++                    // record external activity
+		return b, waitForActivity(b.sub) // wait for next event
+
 	case tea.WindowSizeMsg:
 		b.viewport.Height = msg.Height
 		b.viewport.Width = msg.Width
 		b.help.Width = msg.Width
-		b.viewport.SetContent("Welcome to the bubbletea-starter app")
 
 		if !b.ready {
 			b.ready = true

@@ -17,6 +17,9 @@ func (b Bubble) View() string {
 	if b.help.ShowAll {
 		currentView = b.help.View(b.keys)
 	} else {
+		s := fmt.Sprintf("Welcome to the bubbletea-starter app\n Events received: %d", b.responses)
+		b.viewport.SetContent(s)
+
 		currentView = b.viewport.View()
 	}
 
