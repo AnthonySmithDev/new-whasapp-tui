@@ -7,6 +7,7 @@ import (
 
 	"github.com/knipferrc/bubbletea-starter/internal/config"
 	"github.com/knipferrc/bubbletea-starter/internal/tui"
+	"github.com/knipferrc/bubbletea-starter/internal/wa"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
@@ -49,6 +50,10 @@ var rootCmd = &cobra.Command{
 		if cfg.Settings.EnableMouseWheel {
 			opts = append(opts, tea.WithMouseAllMotion())
 		}
+
+		// Initialize client
+		client := wa.NewClient()
+		client.Connect()
 
 		// Initialize new app.
 		p := tea.NewProgram(b, opts...)

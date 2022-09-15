@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -39,14 +40,18 @@ func (s *stdoutLogger) outputf(level, msg string, args ...interface{}) {
 		colorStart = colors[level]
 		colorReset = "\033[0m"
 	}
+	logPath := "logs"
+	if err := os.MkdirAll(logPath, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
 	filename := strings.ToLower(s.mod) + ".log"
-	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(path.Join(logPath, filename), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 	log.SetOutput(file)
-	log.Println(fmt.Sprintf("%s%s [%s %s] %s%s\n", time.Now().Format("15:04:05.000"), colorStart, s.mod, level, fmt.Sprintf(msg, args...), colorReset))
+	log.Print(fmt.Sprintf("%s%s [%s %s] %s%s\n", time.Now().Format("15:04:05.000"), colorStart, s.mod, level, fmt.Sprintf(msg, args...), colorReset))
 }
 
 func (s *stdoutLogger) Errorf(msg string, args ...interface{}) { s.outputf("ERROR", msg, args...) }
@@ -54,7 +59,7 @@ func (s *stdoutLogger) Warnf(msg string, args ...interface{})  { s.outputf("WARN
 func (s *stdoutLogger) Infof(msg string, args ...interface{})  { s.outputf("INFO", msg, args...) }
 func (s *stdoutLogger) Debugf(msg string, args ...interface{}) { s.outputf("DEBUG", msg, args...) }
 func (s *stdoutLogger) Sub(mod string) waLog.Logger {
-	return &stdoutLogger{mod: fmt.Sprintf("%s/%s", s.mod, mod), color: s.color, min: s.min}
+	return &stdoutLogger{mod: fmt.Sprintf("%s_%s", s.mod, mod), color: s.color, min: s.min}
 }
 
 // Stdout is a simple Logger implementation that outputs to stdout. The module name given is included in log lines.
