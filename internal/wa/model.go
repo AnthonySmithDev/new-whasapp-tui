@@ -1,4 +1,4 @@
-package client
+package wa
 
 import (
 	"go.mau.fi/whatsmeow"
