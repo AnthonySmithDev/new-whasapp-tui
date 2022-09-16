@@ -7,7 +7,6 @@ require (
 	github.com/charmbracelet/bubbletea v0.20.0
 	github.com/charmbracelet/lipgloss v0.5.0
 	github.com/mattn/go-sqlite3 v1.14.15
-	github.com/mdp/qrterminal/v3 v3.0.0
 	github.com/spf13/cobra v1.4.0
 	go.mau.fi/whatsmeow v0.0.0-20220910130319-05fb21147963
 	gopkg.in/yaml.v3 v3.0.1

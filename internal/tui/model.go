@@ -18,7 +18,7 @@ type Bubble struct {
 	appConfig config.Config
 	ready     bool
 
-	sub       chan struct{} // where we'll receive activity notifications
+	Sub       chan struct{} // where we'll receive activity notifications
 	responses int           // how many responses we've received
 }
 
@@ -41,6 +41,6 @@ func NewBubble(cfg config.Config) Bubble {
 		appConfig: cfg,
 		ready:     false,
 
-		sub: make(chan struct{}),
+		Sub: make(chan struct{}),
 	}
 }

@@ -53,7 +53,7 @@ var rootCmd = &cobra.Command{
 
 		// Initialize client
 		client := wa.NewClient()
-		client.Connect()
+		client.Connect(b.Sub)
 
 		// Initialize new app.
 		p := tea.NewProgram(b, opts...)

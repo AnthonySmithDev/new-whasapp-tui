@@ -3,16 +3,15 @@ package wa
 import (
 	"context"
 	"errors"
-	"os"
+	"fmt"
 
-	"github.com/mdp/qrterminal/v3"
+	"github.com/knipferrc/bubbletea-starter/internal/util/qr"
 	"go.mau.fi/whatsmeow"
 )
 
-func (cli Client) GetQR() {
+func (cli Client) GetQR(done chan struct{}) {
 	ch, err := cli.WAClient.GetQRChannel(context.Background())
 	if err != nil {
-		// This error means that we're already logged in, so ignore it.
 		if !errors.Is(err, whatsmeow.ErrQRStoreContainsID) {
 			logMain.Errorf("Failed to get QR channel: %v", err)
 		}
@@ -20,11 +19,12 @@ func (cli Client) GetQR() {
 		go func() {
 			for evt := range ch {
 				if evt.Event == "code" {
-					qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
+					fmt.Print(qr.Generate(evt.Code))
 				} else {
 					logMain.Infof("QR channel result: %s", evt.Event)
 				}
 			}
+			done <- struct{}{}
 		}()
 	}
 }

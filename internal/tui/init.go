@@ -38,8 +38,8 @@ func (b Bubble) Init() tea.Cmd {
 
 	cmds = append(cmds,
 		spinner.Tick,
-		listenForActivity(b.sub), // generate activity
-		waitForActivity(b.sub),   // wait for activity
+		listenForActivity(b.Sub), // generate activity
+		waitForActivity(b.Sub),   // wait for activity
 	)
 
 	return tea.Batch(cmds...)

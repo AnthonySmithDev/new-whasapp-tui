@@ -13,7 +13,7 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case responseMsg:
 		b.responses++                    // record external activity
-		return b, waitForActivity(b.sub) // wait for next event
+		return b, waitForActivity(b.Sub) // wait for next event
 
 	case tea.WindowSizeMsg:
 		b.viewport.Height = msg.Height
