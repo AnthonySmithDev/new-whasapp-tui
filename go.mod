@@ -11,6 +11,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	go.mau.fi/whatsmeow v0.0.0-20220910130319-05fb21147963
 	gopkg.in/yaml.v3 v3.0.1
+	rsc.io/qr v0.2.0
 )
 
 require (
@@ -31,5 +32,4 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
-	rsc.io/qr v0.2.0 // indirect
 )
