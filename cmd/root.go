@@ -40,7 +40,10 @@ var rootCmd = &cobra.Command{
 			}()
 		}
 
-		b := tui.NewBubble(cfg)
+		// Initialize whatsapp client
+		client := wa.NewClient()
+
+		b := tui.NewBubble(cfg, client)
 		var opts []tea.ProgramOption
 
 		// Always append alt screen program option.
@@ -51,16 +54,14 @@ var rootCmd = &cobra.Command{
 			opts = append(opts, tea.WithMouseAllMotion())
 		}
 
-		// Initialize client
-		client := wa.NewClient()
-		client.Connect(b.Sub)
-
 		// Initialize new app.
 		p := tea.NewProgram(b, opts...)
 		if err := p.Start(); err != nil {
 			log.Fatal("Failed to start bubbletea-starter", err)
 			os.Exit(1)
 		}
+		client.Connect()
+
 	},
 }
 

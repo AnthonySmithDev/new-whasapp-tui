@@ -2,6 +2,7 @@ package tui
 
 import (
 	"github.com/knipferrc/bubbletea-starter/internal/config"
+	"github.com/knipferrc/bubbletea-starter/internal/wa"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -20,10 +21,14 @@ type Bubble struct {
 
 	Sub       chan struct{} // where we'll receive activity notifications
 	responses int           // how many responses we've received
+
+	showQR bool
+	textQR string
+	client *wa.Client
 }
 
 // NewBubble creates an instance of the UI.
-func NewBubble(cfg config.Config) Bubble {
+func NewBubble(cfg config.Config, client *wa.Client) Bubble {
 	keys := getDefaultKeyMap()
 
 	l := spinner.New()
@@ -42,5 +47,7 @@ func NewBubble(cfg config.Config) Bubble {
 		ready:     false,
 
 		Sub: make(chan struct{}),
+
+		client: client,
 	}
 }

@@ -20,8 +20,8 @@ var startupTime = time.Now().Unix()
 func (cli Client) eventHandler(rawEvt interface{}) {
 	switch evt := rawEvt.(type) {
 	case *events.AppStateSyncComplete:
-		if len(cli.WAClient.Store.PushName) > 0 && evt.Name == appstate.WAPatchCriticalBlock {
-			err := cli.WAClient.SendPresence(types.PresenceAvailable)
+		if len(cli.waclient.Store.PushName) > 0 && evt.Name == appstate.WAPatchCriticalBlock {
+			err := cli.waclient.SendPresence(types.PresenceAvailable)
 			if err != nil {
 				logMain.Warnf("Failed to send available presence: %v", err)
 			} else {
@@ -29,12 +29,12 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 			}
 		}
 	case *events.Connected, *events.PushNameSetting:
-		if len(cli.WAClient.Store.PushName) == 0 {
+		if len(cli.waclient.Store.PushName) == 0 {
 			return
 		}
 		// Send presence available when connecting and when the pushname is changed.
 		// This makes sure that outgoing messages always have the right pushname.
-		err := cli.WAClient.SendPresence(types.PresenceAvailable)
+		err := cli.waclient.SendPresence(types.PresenceAvailable)
 		if err != nil {
 			logMain.Warnf("Failed to send available presence: %v", err)
 		} else {
@@ -61,7 +61,7 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 
 		img := evt.Message.GetImageMessage()
 		if img != nil {
-			data, err := cli.WAClient.Download(img)
+			data, err := cli.waclient.Download(img)
 			if err != nil {
 				logMain.Errorf("Failed to download image: %v", err)
 				return
@@ -115,8 +115,8 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 		if evt.ErrorCount > 3 {
 			logMain.Debugf("Got >3 keepalive timeouts, forcing reconnect")
 			go func() {
-				cli.WAClient.Disconnect()
-				err := cli.WAClient.Connect()
+				cli.waclient.Disconnect()
+				err := cli.waclient.Connect()
 				if err != nil {
 					logMain.Errorf("Error force-reconnecting after keepalive timeouts: %v", err)
 				}

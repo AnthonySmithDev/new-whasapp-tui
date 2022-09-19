@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/knipferrc/bubbletea-starter/internal/util/qr"
 )
 
 // View returns a string representation of the entire application UI.
 func (b Bubble) View() string {
 	var currentView string
+
+	qr.Generate("https://www.google.com/search?q=bubbletea+center+text+github&sxsrf=ALiCzsYLXbs4_EQ0HSNwlScA8gmqTf8lXA%3A1663612342571&ei=trUoY5e9IpWL0AbW176ABQ")
 
 	if !b.ready {
 		return fmt.Sprintf("%s%s", b.loader.View(), "loading...")

@@ -1,6 +1,7 @@
 package wa
 
 import (
+	"context"
 	"go.mau.fi/whatsmeow"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
@@ -8,26 +9,29 @@ import (
 var logMain waLog.Logger
 
 type Client struct {
-	WAClient       *whatsmeow.Client
+	waclient       *whatsmeow.Client
 	eventHandlerID uint32
+
+	QRChannel <-chan whatsmeow.QRChannelItem
 }
 
-func NewClient() Client {
+func NewClient() *Client {
 	logMain = Stdout("Main", "", true)
-	return Client{}
+	return &Client{}
 }
 
-func (cli Client) Connect(sub chan struct{}) {
+func (cli Client) Connect() {
 	clientLog := Stdout("Client", "", true)
-	cli.WAClient = whatsmeow.NewClient(cli.GetDevice(), clientLog)
-	done := make(chan struct{})
-	if cli.WAClient.Store.ID == nil {
-		cli.GetQR(done)
+	cli.waclient = whatsmeow.NewClient(cli.GetDevice(), clientLog)
+	ch, err := cli.waclient.GetQRChannel(context.Background())
+	if err != nil {
+		logMain.Errorf("Failed to get QR channel: %v", err)
+	} else {
+		cli.QRChannel = ch
 	}
-	cli.eventHandlerID = cli.WAClient.AddEventHandler(cli.eventHandler)
-	if err := cli.WAClient.Connect(); err != nil {
+	cli.eventHandlerID = cli.waclient.AddEventHandler(cli.eventHandler)
+	if err := cli.waclient.Connect(); err != nil {
 		logMain.Errorf("Failed to connect: %v", err)
 		return
 	}
-	<-done
 }

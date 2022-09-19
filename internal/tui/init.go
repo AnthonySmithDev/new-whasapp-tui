@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"go.mau.fi/whatsmeow"
 )
 
 // A message used to indicate that activity has occurred. In the real world (for
@@ -32,14 +33,22 @@ func waitForActivity(sub chan struct{}) tea.Cmd {
 	}
 }
 
+type qrMsg whatsmeow.QRChannelItem
+
+func waitForQR(sub <-chan whatsmeow.QRChannelItem) tea.Cmd {
+	return func() tea.Msg {
+		return qrMsg(<-sub)
+	}
+}
+
 // Init initializes the UI.
 func (b Bubble) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
 	cmds = append(cmds,
 		spinner.Tick,
-		listenForActivity(b.Sub), // generate activity
-		waitForActivity(b.Sub),   // wait for activity
+
+		waitForQR(b.client.QRChannel),
 	)
 
 	return tea.Batch(cmds...)
