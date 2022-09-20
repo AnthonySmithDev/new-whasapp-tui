@@ -20,7 +20,7 @@ func NewClient() *Client {
 	return &Client{}
 }
 
-func (cli Client) Connect() {
+func (cli *Client) GetQRChannel() {
 	clientLog := Stdout("Client", "", true)
 	cli.waclient = whatsmeow.NewClient(cli.GetDevice(), clientLog)
 	ch, err := cli.waclient.GetQRChannel(context.Background())
@@ -29,6 +29,9 @@ func (cli Client) Connect() {
 	} else {
 		cli.QRChannel = ch
 	}
+}
+
+func (cli *Client) Connect() {
 	cli.eventHandlerID = cli.waclient.AddEventHandler(cli.eventHandler)
 	if err := cli.waclient.Connect(); err != nil {
 		logMain.Errorf("Failed to connect: %v", err)

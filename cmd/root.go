@@ -43,6 +43,10 @@ var rootCmd = &cobra.Command{
 		// Initialize whatsapp client
 		client := wa.NewClient()
 
+		client.GetQRChannel()
+
+		client.Connect()
+
 		b := tui.NewBubble(cfg, client)
 		var opts []tea.ProgramOption
 
@@ -60,7 +64,6 @@ var rootCmd = &cobra.Command{
 			log.Fatal("Failed to start bubbletea-starter", err)
 			os.Exit(1)
 		}
-		client.Connect()
 
 	},
 }

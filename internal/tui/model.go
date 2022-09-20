@@ -19,9 +19,6 @@ type Bubble struct {
 	appConfig config.Config
 	ready     bool
 
-	Sub       chan struct{} // where we'll receive activity notifications
-	responses int           // how many responses we've received
-
 	showQR bool
 	textQR string
 	client *wa.Client
@@ -45,8 +42,6 @@ func NewBubble(cfg config.Config, client *wa.Client) Bubble {
 		viewport:  viewport.Model{},
 		appConfig: cfg,
 		ready:     false,
-
-		Sub: make(chan struct{}),
 
 		client: client,
 	}

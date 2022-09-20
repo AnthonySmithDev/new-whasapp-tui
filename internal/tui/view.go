@@ -11,7 +11,9 @@ import (
 func (b Bubble) View() string {
 	var currentView string
 
-	qr.Generate("https://www.google.com/search?q=bubbletea+center+text+github&sxsrf=ALiCzsYLXbs4_EQ0HSNwlScA8gmqTf8lXA%3A1663612342571&ei=trUoY5e9IpWL0AbW176ABQ")
+	if b.showQR {
+		return qr.Generate(b.textQR)
+	}
 
 	if !b.ready {
 		return fmt.Sprintf("%s%s", b.loader.View(), "loading...")
@@ -20,7 +22,7 @@ func (b Bubble) View() string {
 	if b.help.ShowAll {
 		currentView = b.help.View(b.keys)
 	} else {
-		s := fmt.Sprintf("Welcome to the bubbletea-starter app\n Events received: %d", b.responses)
+		s := fmt.Sprintf("Welcome to the bubbletea-starter app")
 		b.viewport.SetContent(s)
 
 		currentView = b.viewport.View()
