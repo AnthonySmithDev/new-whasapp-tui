@@ -1,12 +1,12 @@
 package wa
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"mime"
 	"os"
 	"strings"
-	"sync/atomic"
+	// "sync/atomic"
 	"time"
 
 	"go.mau.fi/whatsmeow/appstate"
@@ -92,22 +92,24 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 			logMain.Infof("%s is now online", evt.From)
 		}
 	case *events.HistorySync:
-		id := atomic.AddInt32(&historySyncID, 1)
-		fileName := fmt.Sprintf("history-%d-%d.json", startupTime, id)
-		file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
-		if err != nil {
-			logMain.Errorf("Failed to open file to write history sync: %v", err)
-			return
-		}
-		enc := json.NewEncoder(file)
-		enc.SetIndent("", "  ")
-		err = enc.Encode(evt.Data)
-		if err != nil {
-			logMain.Errorf("Failed to write history sync: %v", err)
-			return
-		}
-		logMain.Infof("Wrote history sync to %s", fileName)
-		_ = file.Close()
+		cli.db.CreateHistory(evt.Data, cli.waclient)
+
+		// id := atomic.AddInt32(&historySyncID, 1)
+		// fileName := fmt.Sprintf("history-%d-%d.json", startupTime, id)
+		// file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
+		// if err != nil {
+		// 	logMain.Errorf("Failed to open file to write history sync: %v", err)
+		// 	return
+		// }
+		// enc := json.NewEncoder(file)
+		// enc.SetIndent("", "  ")
+		// err = enc.Encode(evt.Data)
+		// if err != nil {
+		// 	logMain.Errorf("Failed to write history sync: %v", err)
+		// 	return
+		// }
+		// logMain.Infof("Wrote history sync to %s", fileName)
+		// _ = file.Close()
 	case *events.AppState:
 		logMain.Debugf("App state event: %+v / %+v", evt.Index, evt.SyncActionValue)
 	case *events.KeepAliveTimeout:

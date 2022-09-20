@@ -2,6 +2,8 @@ package wa
 
 import (
 	"context"
+
+	"github.com/knipferrc/bubbletea-starter/internal/repository"
 	"go.mau.fi/whatsmeow"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
@@ -13,11 +15,15 @@ type Client struct {
 	eventHandlerID uint32
 
 	QRChannel <-chan whatsmeow.QRChannelItem
+
+	db *repository.DB
 }
 
-func NewClient() *Client {
+func NewClient(db *repository.DB) *Client {
 	logMain = Stdout("Main", "", true)
-	return &Client{}
+	return &Client{
+		db: db,
+	}
 }
 
 func (cli *Client) GetQRChannel() {

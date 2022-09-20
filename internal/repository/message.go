@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"time"
-
-	"gorm.io/gorm"
+	db "github.com/sonyarouje/simdb"
+	"go.mau.fi/whatsmeow/binary/proto"
 )
 
 type MsgType uint
@@ -18,46 +17,41 @@ const (
 )
 
 type Message struct {
-	MessageTimestamp time.Time
-	MsgOrderId       uint64
-	RemoteJid        string
-	FromMe           bool
-	Msg              string
-	MsgType          MsgType
+	*proto.Message
+}
+
+func (c Message) ID() (jsonField string, value interface{}) {
+	value = c.GetOrderMessage().GetOrderId()
+	jsonField = "message_id"
+	return
 }
 
 type MessageInter interface {
 	Create(Message)
-	CreateBatch([]Message)
 	FindOne(string) Message
-	FindAll(string) []Message
+	FindMany(string) []Message
 }
 
-type messageImpl struct {
-	db *gorm.DB
+type MessageImpl struct {
+	db *db.Driver
 }
 
-func (repository *messageImpl) Create(message Message) {
-	repository.db.Create(&message)
+func (repository *MessageImpl) Create(message Message) {
+	repository.db.Open(Message{}).Insert(message)
 }
 
-func (repository *messageImpl) CreateBatch(messages []Message) {
-	repository.db.Create(&messages)
-}
-
-func (repository *messageImpl) FindAll(jid string) []Message {
-	var message []Message
-	repository.db.Where(&Message{RemoteJid: jid}).Find(&message)
-	return message
-}
-
-func (repository *messageImpl) FindOne(jid string) Message {
+func (repository *MessageImpl) FindOne(jid string) Message {
 	var message Message
-	repository.db.Where(&Message{RemoteJid: jid}).Last(&message)
+	repository.db.Open(Message{}).Where("conversation_id", "=", jid).First().AsEntity(&message)
 	return message
 }
 
-func NewMessage(db *gorm.DB) MessageInter {
-	db.AutoMigrate(&Message{})
-	return &messageImpl{db}
+func (repository *MessageImpl) FindMany(jid string) []Message {
+	var messages []Message
+	repository.db.Open(Message{}).Where("conversation_id", "=", jid).Get().AsEntity(&messages)
+	return messages
+}
+
+func NewMessage(db *db.Driver) MessageInter {
+	return &MessageImpl{db}
 }

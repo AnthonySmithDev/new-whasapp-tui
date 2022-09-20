@@ -2,4 +2,6 @@ vendor/
 .DS_Store
 debug.log
 logs/
-store.db
+data/
+*.db
+*.jpe

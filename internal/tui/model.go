@@ -2,6 +2,7 @@ package tui
 
 import (
 	"github.com/knipferrc/bubbletea-starter/internal/config"
+	"github.com/knipferrc/bubbletea-starter/internal/repository"
 	"github.com/knipferrc/bubbletea-starter/internal/wa"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -31,7 +32,7 @@ type Bubble struct {
 }
 
 // NewBubble creates an instance of the UI.
-func NewBubble(cfg config.Config, client *wa.Client) Bubble {
+func NewBubble(cfg config.Config, client *wa.Client, db *repository.DB) Bubble {
 	keys := getDefaultKeyMap()
 
 	l := spinner.New()

@@ -41,7 +41,9 @@ var rootCmd = &cobra.Command{
 			}()
 		}
 
-		client := wa.NewClient()
+		db := repository.NewDB()
+
+		client := wa.NewClient(db)
 
 		client.GetQRChannel()
 

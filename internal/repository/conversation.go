@@ -1,55 +1,46 @@
 package repository
 
 import (
-	"gorm.io/gorm"
+	db "github.com/sonyarouje/simdb"
+	"go.mau.fi/whatsmeow/binary/proto"
 )
 
 type Conversation struct {
-	JID     string
-	Name    string
-	IsGroup bool
+	*proto.Conversation
+}
+
+func (c Conversation) ID() (jsonField string, value interface{}) {
+	value = c.GetId()
+	jsonField = "conversation_id"
+	return
 }
 
 type ConversationInter interface {
 	Create(Conversation)
-	CreateBatch([]Conversation)
 	FindOne() Conversation
-	FindAll() []Conversation
+	FindMany() []Conversation
 }
 
 type conversationImpl struct {
-	db *gorm.DB
+	db *db.Driver
 }
 
 func (repository *conversationImpl) Create(conversation Conversation) {
-	repository.db.Create(&conversation)
-}
-
-func (repository *conversationImpl) CreateBatch(conversations []Conversation) {
-	repository.db.Create(&conversations)
+	repository.db.Open(Conversation{}).Insert(conversation)
 }
 
 func (repository *conversationImpl) FindOne() Conversation {
 	var conversation Conversation
-	repository.db.First(&conversation)
+	repository.db.Open(Conversation{}).First().AsEntity(&conversation)
 	return conversation
 }
 
-func (repository *conversationImpl) FindAll() []Conversation {
+func (repository *conversationImpl) FindMany() []Conversation {
 	var conversation []Conversation
-	repository.db.Find(&conversation)
+	repository.db.Open(Conversation{}).Get().AsEntity(&conversation)
 	return conversation
 }
 
-func NewConversation(db *gorm.DB) ConversationInter {
-	db.AutoMigrate(&Conversation{})
+func NewConversation(db *db.Driver) ConversationInter {
 	return &conversationImpl{db}
-}
-func (c *Conversation) AfterFind(tx *gorm.DB) (err error) {
-	// if !c.IsGroup {
-	// 	jid, _ := types.ParseJID(c.JID)
-	// 	contact, _ := wa.Store.GetContact(jid)
-	// 	c.Name = contact.FullName
-	// }
-	return
 }

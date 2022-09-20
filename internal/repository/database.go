@@ -1,21 +1,35 @@
 package repository
 
 import (
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	db "github.com/sonyarouje/simdb"
+	"go.mau.fi/whatsmeow"
+	"go.mau.fi/whatsmeow/binary/proto"
+	"go.mau.fi/whatsmeow/types"
 )
 
 type DB struct {
-	*gorm.DB
-	message MessageInter
+	message      MessageInter
+	conversation ConversationInter
 }
 
 func NewDB() *DB {
-	db, err := gorm.Open(sqlite.Open("chat.db"), &gorm.Config{})
+	driver, err := db.New("data")
 	if err != nil {
-		panic("failed to connect database")
+		panic(err)
 	}
 	return &DB{
-		db,
+		message:      NewMessage(driver),
+		conversation: NewConversation(driver),
+	}
+}
+
+func (db *DB) CreateHistory(history *proto.HistorySync, cli *whatsmeow.Client) {
+	for _, conv := range history.GetConversations() {
+		chatJID, _ := types.ParseJID(conv.GetId())
+		db.conversation.Create(Conversation{conv})
+		for _, historyMsg := range conv.GetMessages() {
+			msg, _ := cli.ParseWebMessage(chatJID, historyMsg.GetMessage())
+			db.message.Create(Message{msg.Message})
+		}
 	}
 }
