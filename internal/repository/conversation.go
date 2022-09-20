@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"strings"
+
 	db "github.com/sonyarouje/simdb"
 	"go.mau.fi/whatsmeow/binary/proto"
 )
@@ -13,6 +15,14 @@ func (c Conversation) ID() (jsonField string, value interface{}) {
 	value = c.GetId()
 	jsonField = "conversation_id"
 	return
+}
+
+func (c Conversation) Title() string       { return c.GetName() }
+func (c Conversation) Description() string { return c.GetId() }
+func (c Conversation) FilterValue() string { return c.GetId() }
+
+func (c Conversation) IsGroup() bool {
+	return strings.Contains(c.GetId(), "@g.us")
 }
 
 type ConversationInter interface {

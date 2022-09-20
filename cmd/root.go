@@ -49,7 +49,7 @@ var rootCmd = &cobra.Command{
 
 		client.Connect()
 
-		b := tui.NewBubble(cfg, client)
+		b := tui.NewBubble(cfg, client, db)
 		var opts []tea.ProgramOption
 
 		// Always append alt screen program option.

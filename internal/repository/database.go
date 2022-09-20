@@ -5,11 +5,12 @@ import (
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
+	"go.mau.fi/whatsmeow/types/events"
 )
 
 type DB struct {
-	message      MessageInter
-	conversation ConversationInter
+	Message      MessageInter
+	Conversation ConversationInter
 }
 
 func NewDB() *DB {
@@ -18,18 +19,23 @@ func NewDB() *DB {
 		panic(err)
 	}
 	return &DB{
-		message:      NewMessage(driver),
-		conversation: NewConversation(driver),
+		Message:      NewMessage(driver),
+		Conversation: NewConversation(driver),
 	}
 }
 
 func (db *DB) CreateHistory(history *proto.HistorySync, cli *whatsmeow.Client) {
 	for _, conv := range history.GetConversations() {
 		chatJID, _ := types.ParseJID(conv.GetId())
-		db.conversation.Create(Conversation{conv})
 		for _, historyMsg := range conv.GetMessages() {
 			msg, _ := cli.ParseWebMessage(chatJID, historyMsg.GetMessage())
-			db.message.Create(Message{msg.Message})
+			db.Message.Create(Message{msg})
 		}
+		conv.Messages = nil
+		db.Conversation.Create(Conversation{conv})
 	}
+}
+
+func (db *DB) CreateMessage(msg *events.Message) {
+	db.Message.Create(Message{msg})
 }

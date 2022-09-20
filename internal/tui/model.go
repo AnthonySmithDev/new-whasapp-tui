@@ -42,6 +42,22 @@ func NewBubble(cfg config.Config, client *wa.Client, db *repository.DB) Bubble {
 	h.Styles.FullKey.Foreground(lipgloss.Color("#ffffff"))
 	h.Styles.FullDesc.Foreground(lipgloss.Color("#ffffff"))
 
+	var items []list.Item
+	convs := db.Conversation.FindMany()
+	for _, conv := range convs {
+		var item item
+		item.id = conv.GetId()
+		if conv.IsGroup() {
+			item.title = conv.GetName()
+		} else {
+			contact := client.GetContact(item.id)
+			item.title = contact.FullName
+		}
+		message := db.Message.FindOne(item.id)
+		item.desc = message.Message.Message.GetConversation()
+		items = append(items, item)
+	}
+
 	return Bubble{
 		keys:      keys,
 		help:      h,
@@ -52,11 +68,20 @@ func NewBubble(cfg config.Config, client *wa.Client, db *repository.DB) Bubble {
 		chatState:    listView,
 		chatTextarea: defaultTextarea(),
 		chatViewport: viewport.Model{},
-		chatList:     list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+		chatList:     list.New(items, list.NewDefaultDelegate(), 30, 100),
 
 		client: client,
 	}
 }
+
+type item struct {
+	id, title, desc string
+}
+
+func (i item) GetIDD() string      { return i.id }
+func (i item) Title() string       { return i.title }
+func (i item) Description() string { return i.desc }
+func (i item) FilterValue() string { return i.title }
 
 type stateView uint
 

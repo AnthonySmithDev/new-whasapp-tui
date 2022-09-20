@@ -5,6 +5,7 @@ import (
 
 	"github.com/knipferrc/bubbletea-starter/internal/repository"
 	"go.mau.fi/whatsmeow"
+	"go.mau.fi/whatsmeow/types"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
@@ -43,4 +44,16 @@ func (cli *Client) Connect() {
 		logMain.Errorf("Failed to connect: %v", err)
 		return
 	}
+}
+
+func (cli *Client) GetContact(jid string) types.ContactInfo {
+	userJID, err := types.ParseJID(jid)
+	if err != nil {
+		return types.ContactInfo{FullName: jid}
+	}
+	contact, err := cli.waclient.Store.Contacts.GetContact(userJID)
+	if err != nil {
+		return types.ContactInfo{FullName: jid}
+	}
+	return contact
 }

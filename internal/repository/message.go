@@ -2,7 +2,7 @@ package repository
 
 import (
 	db "github.com/sonyarouje/simdb"
-	"go.mau.fi/whatsmeow/binary/proto"
+	"go.mau.fi/whatsmeow/types/events"
 )
 
 type MsgType uint
@@ -17,11 +17,11 @@ const (
 )
 
 type Message struct {
-	*proto.Message
+	*events.Message
 }
 
 func (c Message) ID() (jsonField string, value interface{}) {
-	value = c.GetOrderMessage().GetOrderId()
+	value = c.Info.ID
 	jsonField = "message_id"
 	return
 }
@@ -41,14 +41,14 @@ func (repository *MessageImpl) Create(message Message) {
 }
 
 func (repository *MessageImpl) FindOne(jid string) Message {
-	var message Message
-	repository.db.Open(Message{}).Where("conversation_id", "=", jid).First().AsEntity(&message)
-	return message
+	var messages []Message
+	repository.db.Open(Message{}).Where("Info.Chat", "=", jid).Get().AsEntity(&messages)
+	return messages[len(messages)-1]
 }
 
 func (repository *MessageImpl) FindMany(jid string) []Message {
 	var messages []Message
-	repository.db.Open(Message{}).Where("conversation_id", "=", jid).Get().AsEntity(&messages)
+	repository.db.Open(Message{}).Where("Info.Chat", "=", jid).Get().AsEntity(&messages)
 	return messages
 }
 

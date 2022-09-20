@@ -2,10 +2,10 @@ package wa
 
 import (
 	// "encoding/json"
-	"fmt"
-	"mime"
+	// "fmt"
+	// "mime"
 	"os"
-	"strings"
+	// "strings"
 	// "sync/atomic"
 	"time"
 
@@ -43,38 +43,39 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 	case *events.StreamReplaced:
 		os.Exit(0)
 	case *events.Message:
-		metaParts := []string{fmt.Sprintf("pushname: %s", evt.Info.PushName), fmt.Sprintf("timestamp: %s", evt.Info.Timestamp)}
-		if evt.Info.Type != "" {
-			metaParts = append(metaParts, fmt.Sprintf("type: %s", evt.Info.Type))
-		}
-		if evt.Info.Category != "" {
-			metaParts = append(metaParts, fmt.Sprintf("category: %s", evt.Info.Category))
-		}
-		if evt.IsViewOnce {
-			metaParts = append(metaParts, "view once")
-		}
-		if evt.IsViewOnce {
-			metaParts = append(metaParts, "ephemeral")
-		}
+		cli.db.CreateMessage(evt)
+		// metaParts := []string{fmt.Sprintf("pushname: %s", evt.Info.PushName), fmt.Sprintf("timestamp: %s", evt.Info.Timestamp)}
+		// if evt.Info.Type != "" {
+		// 	metaParts = append(metaParts, fmt.Sprintf("type: %s", evt.Info.Type))
+		// }
+		// if evt.Info.Category != "" {
+		// 	metaParts = append(metaParts, fmt.Sprintf("category: %s", evt.Info.Category))
+		// }
+		// if evt.IsViewOnce {
+		// 	metaParts = append(metaParts, "view once")
+		// }
+		// if evt.IsViewOnce {
+		// 	metaParts = append(metaParts, "ephemeral")
+		// }
 
-		logMain.Infof("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
+		// logMain.Infof("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
 
-		img := evt.Message.GetImageMessage()
-		if img != nil {
-			data, err := cli.waclient.Download(img)
-			if err != nil {
-				logMain.Errorf("Failed to download image: %v", err)
-				return
-			}
-			exts, _ := mime.ExtensionsByType(img.GetMimetype())
-			path := fmt.Sprintf("%s%s", evt.Info.ID, exts[0])
-			err = os.WriteFile(path, data, 0600)
-			if err != nil {
-				logMain.Errorf("Failed to save image: %v", err)
-				return
-			}
-			logMain.Infof("Saved image in message to %s", path)
-		}
+		// img := evt.Message.GetImageMessage()
+		// if img != nil {
+		// 	data, err := cli.waclient.Download(img)
+		// 	if err != nil {
+		// 		logMain.Errorf("Failed to download image: %v", err)
+		// 		return
+		// 	}
+		// 	exts, _ := mime.ExtensionsByType(img.GetMimetype())
+		// 	path := fmt.Sprintf("%s%s", evt.Info.ID, exts[0])
+		// 	err = os.WriteFile(path, data, 0600)
+		// 	if err != nil {
+		// 		logMain.Errorf("Failed to save image: %v", err)
+		// 		return
+		// 	}
+		// 	logMain.Infof("Saved image in message to %s", path)
+		// }
 	case *events.Receipt:
 		if evt.Type == events.ReceiptTypeRead || evt.Type == events.ReceiptTypeReadSelf {
 			logMain.Infof("%v was read by %s at %s", evt.MessageIDs, evt.SourceString(), evt.Timestamp)
