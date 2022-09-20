@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/knipferrc/bubbletea-starter/internal/config"
+	"github.com/knipferrc/bubbletea-starter/internal/repository"
 	"github.com/knipferrc/bubbletea-starter/internal/tui"
 	"github.com/knipferrc/bubbletea-starter/internal/wa"
 
@@ -40,7 +41,6 @@ var rootCmd = &cobra.Command{
 			}()
 		}
 
-		// Initialize whatsapp client
 		client := wa.NewClient()
 
 		client.GetQRChannel()
