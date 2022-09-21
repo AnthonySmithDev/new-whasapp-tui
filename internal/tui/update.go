@@ -17,11 +17,16 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.Event == "code" {
 			b.showQR = true
 			b.textQR = msg.Code
+			return b, waitForQR(b.client.QRChannel)
 		} else if msg.Event == "success" {
 			b.showQR = false
 			b.textQR = ""
+			return b, nil
 		}
-		return b, waitForQR(b.client.QRChannel)
+
+	case connectedMsg:
+		b.ready = true
+		return b, waitForConnected(b.client.Connected)
 
 	case tea.WindowSizeMsg:
 		h, v := defaultStyle.GetFrameSize()
@@ -52,10 +57,6 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.help.Width = msg.Width
 		b.chatViewport.SetContent("Welcome to the bubbletea-starter app")
 
-		if !b.ready {
-			b.ready = true
-		}
-
 	case tea.KeyMsg:
 		// switch {
 		// case key.Matches(msg, b.keys.Quit):
@@ -85,9 +86,7 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				listItem := b.chatList.SelectedItem().(item)
 				b.chatJID = listItem.GetID()
 				messages := b.db.Message.FindMany(b.chatJID)
-				for _, message := range messages {
-					b.messages = append(b.messages, message.Message.Message.GetConversation())
-				}
+				b.messages = messages.ToList()
 				b.chatViewport.SetContent(strings.Join(b.messages, "\n"))
 				b.chatViewport.GotoBottom()
 				b.chatState = textareaView

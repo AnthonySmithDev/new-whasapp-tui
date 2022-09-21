@@ -4,6 +4,7 @@ import (
 	// "encoding/json"
 	// "fmt"
 	// "mime"
+	"fmt"
 	"os"
 	// "strings"
 	// "sync/atomic"
@@ -17,6 +18,10 @@ import (
 var historySyncID int32
 var startupTime = time.Now().Unix()
 
+func Print(text string) {
+	fmt.Println(text)
+}
+
 func (cli Client) eventHandler(rawEvt interface{}) {
 	switch evt := rawEvt.(type) {
 	case *events.AppStateSyncComplete:
@@ -29,6 +34,7 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 			}
 		}
 	case *events.Connected, *events.PushNameSetting:
+		cli.Connected <- struct{}{}
 		if len(cli.waclient.Store.PushName) == 0 {
 			return
 		}

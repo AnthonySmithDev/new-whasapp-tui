@@ -47,19 +47,22 @@ func NewBubble(cfg config.Config, client *wa.Client, db *repository.DB) Bubble {
 	h.Styles.FullDesc.Foreground(lipgloss.Color("#ffffff"))
 
 	var items []list.Item
-	convs := db.Conversation.FindMany()
-	for _, conv := range convs {
-		var item item
-		item.id = conv.GetId()
-		if conv.IsGroup() {
-			item.title = conv.GetName()
-		} else {
-			contact := client.GetContact(item.id)
-			item.title = contact.FullName
+
+	if client.IsConnected() {
+		convs := db.Conversation.FindMany()
+		for _, conv := range convs {
+			var item item
+			item.id = conv.GetId()
+			if conv.IsGroup() {
+				item.title = conv.GetName()
+			} else {
+				contact := client.GetContact(item.id)
+				item.title = contact.FullName
+			}
+			message := db.Message.FindOne(item.id)
+			item.desc = message.ToString()
+			items = append(items, item)
 		}
-		message := db.Message.FindOne(item.id)
-		item.desc = message.Message.Message.GetConversation()
-		items = append(items, item)
 	}
 
 	return Bubble{

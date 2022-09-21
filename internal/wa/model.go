@@ -6,7 +6,6 @@ import (
 	"github.com/knipferrc/bubbletea-starter/internal/repository"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/types"
-	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
@@ -16,19 +15,17 @@ type Client struct {
 	waclient       *whatsmeow.Client
 	eventHandlerID uint32
 
-	QRChannel      <-chan whatsmeow.QRChannelItem
-	MessageChannel chan events.Message
-	HistorySync    chan events.Message
+	QRChannel <-chan whatsmeow.QRChannelItem
+	Connected chan struct{}
 
 	db *repository.DB
 }
 
 func NewClient(db *repository.DB) *Client {
 	logMain = Stdout("Main", "", true)
-	msgChannel := make(chan events.Message)
 	return &Client{
-		db:             db,
-		MessageChannel: msgChannel,
+		db:        db,
+		Connected: make(chan struct{}),
 	}
 }
 
@@ -61,4 +58,8 @@ func (cli *Client) GetContact(jid string) types.ContactInfo {
 		return types.ContactInfo{FullName: jid}
 	}
 	return contact
+}
+
+func (cli *Client) IsConnected() bool {
+	return cli.waclient.IsConnected() && cli.waclient.Store.ID != nil
 }
