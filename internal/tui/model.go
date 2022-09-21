@@ -15,20 +15,24 @@ import (
 
 // Bubble represents the state of the UI.
 type Bubble struct {
-	keys         keyMap
-	help         help.Model
-	loader       spinner.Model
-	chatViewport viewport.Model
-	appConfig    config.Config
-	ready        bool
+	keys      keyMap
+	help      help.Model
+	loader    spinner.Model
+	appConfig config.Config
+	ready     bool
 
+	chatJID      string
 	chatState    stateView
 	chatList     list.Model
+	chatViewport viewport.Model
+	messages     []string
 	chatTextarea textarea.Model
 
 	showQR bool
 	textQR string
+
 	client *wa.Client
+	db     *repository.DB
 }
 
 // NewBubble creates an instance of the UI.
@@ -71,6 +75,7 @@ func NewBubble(cfg config.Config, client *wa.Client, db *repository.DB) Bubble {
 		chatList:     list.New(items, list.NewDefaultDelegate(), 30, 100),
 
 		client: client,
+		db:     db,
 	}
 }
 
@@ -78,7 +83,7 @@ type item struct {
 	id, title, desc string
 }
 
-func (i item) GetIDD() string      { return i.id }
+func (i item) GetID() string       { return i.id }
 func (i item) Title() string       { return i.title }
 func (i item) Description() string { return i.desc }
 func (i item) FilterValue() string { return i.title }

@@ -49,7 +49,18 @@ func (repository *MessageImpl) FindOne(jid string) Message {
 func (repository *MessageImpl) FindMany(jid string) []Message {
 	var messages []Message
 	repository.db.Open(Message{}).Where("Info.Chat", "=", jid).Get().AsEntity(&messages)
-	return messages
+	// for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+	// 	messages[i], messages[j] = messages[j], messages[i]
+	// }
+	return reverse(messages)
+}
+
+func reverse(messages []Message) []Message {
+	newMessages := make([]Message, len(messages))
+	for i, j := 0, len(messages)-1; i <= j; i, j = i+1, j-1 {
+		newMessages[i], newMessages[j] = messages[j], messages[i]
+	}
+	return newMessages
 }
 
 func NewMessage(db *db.Driver) MessageInter {

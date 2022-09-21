@@ -2,6 +2,8 @@ package tui
 
 import (
 	// "github.com/charmbracelet/bubbles/key"
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -79,6 +81,16 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEnter:
 			switch b.chatState {
 			case listView:
+				b.messages = []string{}
+				listItem := b.chatList.SelectedItem().(item)
+				b.chatJID = listItem.GetID()
+				messages := b.db.Message.FindMany(b.chatJID)
+				for _, message := range messages {
+					b.messages = append(b.messages, message.Message.Message.GetConversation())
+				}
+				b.chatViewport.SetContent(strings.Join(b.messages, "\n"))
+				b.chatViewport.GotoBottom()
+				b.chatState = textareaView
 				break
 			case viewportView:
 				break
