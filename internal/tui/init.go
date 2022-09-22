@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"go.mau.fi/whatsmeow"
+	"go.mau.fi/whatsmeow/types/events"
 )
 
 type qrMsg whatsmeow.QRChannelItem
@@ -22,14 +23,23 @@ func waitForConnected(ch <-chan struct{}) tea.Cmd {
 	}
 }
 
+type messageMsg *events.Message
+
+func waitForMessage(ch <-chan *events.Message) tea.Cmd {
+	return func() tea.Msg {
+		return messageMsg(<-ch)
+	}
+}
+
 // Init initializes the UI.
 func (b Bubble) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
 	cmds = append(cmds,
 		spinner.Tick,
-		waitForConnected(b.client.Connected),
 		waitForQR(b.client.QRChannel),
+		waitForConnected(b.client.Connected),
+		waitForMessage(b.client.Message),
 	)
 
 	return tea.Batch(cmds...)

@@ -49,6 +49,7 @@ func (cli Client) eventHandler(rawEvt interface{}) {
 	case *events.StreamReplaced:
 		os.Exit(0)
 	case *events.Message:
+		cli.Message <- evt
 		cli.db.CreateMessage(evt)
 		// metaParts := []string{fmt.Sprintf("pushname: %s", evt.Info.PushName), fmt.Sprintf("timestamp: %s", evt.Info.Timestamp)}
 		// if evt.Info.Type != "" {

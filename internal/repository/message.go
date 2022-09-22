@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/charmbracelet/lipgloss"
 	db "github.com/sonyarouje/simdb"
 	"go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
@@ -28,7 +29,7 @@ func (c Message) ID() (jsonField string, value interface{}) {
 }
 
 func (message *Message) ToString() string {
-	return getMessageText(message.Message.Message)
+	return messageToText(message.Message.Message)
 }
 
 type MessageInter interface {
@@ -46,7 +47,7 @@ type Messages []Message
 func (messages Messages) ToList() []string {
 	var list []string
 	for _, message := range messages {
-		list = append(list, getMessageText(message.Message.Message))
+		list = append(list, messageToText(message.Message.Message))
 	}
 	return list
 }
@@ -79,7 +80,7 @@ func NewMessage(db *db.Driver) MessageInter {
 	return &MessageImpl{db}
 }
 
-func getMessageText(message *proto.Message) string {
+func messageToText(message *proto.Message) string {
 	if message.GetExtendedTextMessage() != nil {
 		return "Link"
 	}
@@ -108,4 +109,35 @@ func getMessageText(message *proto.Message) string {
 		return "Sticker"
 	}
 	return message.GetConversation()
+}
+
+func messageToStyle(message *proto.Message) lipgloss.Style {
+	if message.GetExtendedTextMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
+	}
+	if message.GetImageMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	}
+	if message.GetDocumentMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
+	}
+	if message.GetContactMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("4"))
+	}
+	if message.GetLocationMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+	}
+	if message.GetInvoiceMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("6"))
+	}
+	if message.GetAudioMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("7"))
+	}
+	if message.GetVideoMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+	}
+	if message.GetStickerMessage() != nil {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
+	}
+	return lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/knipferrc/bubbletea-starter/internal/repository"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/types"
+	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
@@ -17,6 +18,7 @@ type Client struct {
 
 	QRChannel <-chan whatsmeow.QRChannelItem
 	Connected chan struct{}
+	Message   chan *events.Message
 
 	db *repository.DB
 }
@@ -26,6 +28,7 @@ func NewClient(db *repository.DB) *Client {
 	return &Client{
 		db:        db,
 		Connected: make(chan struct{}),
+		Message:   make(chan *events.Message),
 	}
 }
 
