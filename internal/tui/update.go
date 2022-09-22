@@ -35,11 +35,15 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		rigthWidth := msg.Width*60/100 - h
 
 		listHeight := msg.Height - v
-		viewportHeight := msg.Height*90/100 - v
-		textareaHeight := msg.Height*10/100 - v
-		if msg.Height < 30 {
-			viewportHeight = msg.Height*80/100 - v
-			textareaHeight = msg.Height*20/100 - v
+
+		viewportHeight := msg.Height - 5 - v
+		textareaHeight := 5 - v
+		if msg.Height < 20 {
+			viewportHeight = msg.Height - 3 - v
+			textareaHeight = 3 - v
+		} else if msg.Height < 30 {
+			viewportHeight = msg.Height - 4 - v
+			textareaHeight = 4 - v
 		}
 
 		// set list size
