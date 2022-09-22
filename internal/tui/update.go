@@ -4,6 +4,7 @@ import (
 	// "github.com/charmbracelet/bubbles/key"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -26,7 +27,25 @@ func (b Bubble) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case connectedMsg:
 		b.ready = true
-		return b, waitForConnected(b.client.Connected)
+		var items []list.Item
+		if b.client.IsConnected() {
+			convs := b.db.Conversation.FindMany()
+			for _, conv := range convs {
+				var item item
+				item.id = conv.GetId()
+				if conv.IsGroup() {
+					item.title = conv.GetName()
+				} else {
+					contact := b.client.GetContact(item.id)
+					item.title = contact.FullName
+				}
+				message := b.db.Message.FindOne(item.id)
+				item.desc = message.ToString()
+				items = append(items, item)
+			}
+		}
+		b.chatList.SetItems(items)
+		return b, nil
 
 	case tea.WindowSizeMsg:
 		h, v := defaultStyle.GetFrameSize()
